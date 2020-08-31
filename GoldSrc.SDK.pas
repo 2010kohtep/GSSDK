@@ -3,6 +3,9 @@
 (*  Module:                                                                      *)
 (*    GoldSrc.SDK                                                                *)
 (*                                                                               *)
+(*  License:                                                                     *)
+(*    You may freely use this code provided you retain this copyright message.   *)
+(*                                                                               *)
 (*  Description:                                                                 *)
 (*    Provides relatively full SDK for GoldSource renderer library.              *)
 (*                                                                               *)
@@ -31,21 +34,18 @@
 unit GoldSrc.SDK;
 
 {$LEGACYIFEND ON}
-
-{$Align 4}
-{$MinEnumSize 4}
+{$MINENUMSIZE 4}
 
 {$UNDEF MSME}
 
 interface
 
-uses
-  Winapi.Windows;
+const
+  GSSDK_VERSION = 20200901;
 
 const
-  GSSDK_VERSION = 20200831;
+  MAX_PATH = 260;
 
-const
   FBEAM_STARTENTITY = $00000001;
   FBEAM_ENDENTITY = $00000002;
   FBEAM_FADEIN = $00000004;
@@ -2244,7 +2244,7 @@ type
   flowstats_t = record
     size: Integer;
     time: Double;
-  end align 8;
+  end;
   TFlowStats = flowstats_t;
   PFlowStats = ^TFlowStats;
   {$IF SizeOf(TFlowStats) <> 16} {$MESSAGE WARN 'Structure size mismatch @ TFlowStats.'} {$DEFINE MSME} {$IFEND}
@@ -2255,7 +2255,7 @@ type
     nextcompute: Double;
     kbytespersec: Single;
     avgkbytespersec: Single;
-  end align 8;
+  end;
   TFlow = flow_t;
   PFlow = ^TFlow;
   {$IF SizeOf(TFlow) <> 536} {$MESSAGE WARN 'Structure size mismatch @ TFlow.'} {$DEFINE MSME} {$IFEND}
@@ -2372,7 +2372,7 @@ type
 
     // Incoming and outgoing flow metrics
     flow: array[0..1] of flow_t;
-  end align 8;
+  end;
   netchan_t = netchan_s;
 
   TNetchan = netchan_t;
@@ -2973,7 +2973,7 @@ type
     usrbytes: UInt16;
     voicebytes: UInt16;
     msgbytes: UInt16;
-  end align 8;
+  end;
   frame_t = frame_s;
 
   TFrame = frame_s;
@@ -2998,7 +2998,7 @@ type
     customdata: customization_t;
     hashedcdkey: array[0..15] of AnsiChar;
     m_nSteamID: UInt64;
-  end align 8;
+  end;
   player_info_s = player_info_t;
 
   TPlayerInfo = player_info_s;
@@ -3043,14 +3043,13 @@ type
     soundFadeOutTime: Integer;
     soundFadeHoldTime: Integer;
     soundFadeInTime: Integer;
-  end align 8;
+  end;
   soundfade_t = soundfade_s;
 
   TSoundFade = soundfade_s;
   PSoundFade = ^soundfade_s;
   {$IF SizeOf(TSoundFade) <> 32} {$MESSAGE WARN 'Structure size mismatch @ TSoundFade.'} {$DEFINE MSME} {$IFEND}
 
-  {$Align 8}
   client_static_s = record
     state: cactive_e;
     netchan: netchan_s;
@@ -3104,7 +3103,6 @@ type
     GameServerSteamID: UInt64; // UInt32?
     build_num: Integer;
   end;
-  {$Align 4}
   client_static_t = client_static_s;
 
   TClientStatic = client_static_s;
@@ -3133,7 +3131,6 @@ type
   {$IF SizeOf(TEventState) <> 5632} {$MESSAGE WARN 'Structure size mismatch @ TEventState.'} {$DEFINE MSME} {$IFEND}
 
   // @xref: "CL_ClearClientState"
-  {$Align 8}
   client_state_s = record
     max_edicts: Integer;
     resourcesonhand: resource_t;
@@ -3208,7 +3205,6 @@ type
     events: event_state_s;
     downloadUrl: array[0..127] of AnsiChar;
   end;
-  {$Align 4}
   client_state_t = client_state_s;
 
   TClientState = client_state_s;
@@ -3808,6 +3804,14 @@ type
   TSentenceEntry = sentenceEntry_;
   PSentenceEntry = ^sentenceEntry_;
 
+  POINT_s = record
+    x, y: Integer;
+  end;
+  POINT = POINT_s;
+
+  TPoint = POINT_s;
+  PPoint = ^POINT_s;
+
   pfnEngSrc_Callback_t = procedure; cdecl;
   pfnEvent_Callback_t = procedure(const args: event_args_s); cdecl;
 
@@ -4116,7 +4120,6 @@ type
   PExtraBaselines = ^extra_baselines_s;
 
   // @xref: Host_ShutdownServer
-  {$Align 8}
   server_t = record
     active: qboolean;
     paused: qboolean;
@@ -4164,7 +4167,6 @@ type
     signon: sizebuf_s;
     signon_data: array[0..32767] of Byte;
   end;
-  {$Align 4}
 
   TServer = server_t;
   PServer = ^server_t;
@@ -4548,13 +4550,11 @@ type
   TTrace = trace_t;
   PTrace = ^trace_t;
 
-  {$Align 8}
   USERID_s = record
     idtype: Integer;
     m_SteamID: UInt64;
     clientip: Cardinal;
   end;
-  {$Align 4}
   USERID_t = USERID_s;
 
   TUserID = USERID_s;
@@ -4606,7 +4606,6 @@ type
   PClientFrame = ^client_frame_s;
 
   // @xref: Host_ClearClients
-  {$Align 8}
   client_s = record
     active: qboolean;
     spawned: qboolean;
@@ -4664,7 +4663,6 @@ type
     m_lastvoicetime: Double;
     m_sendrescount: Integer;
   end;
-  {$Align 4}
   client_t = client_s;
 
   TClient = client_s;
@@ -5292,7 +5290,7 @@ type
   pfnEngSrc_GetTrackerIDForPlayer_t = function(playerSlot: Integer): Integer; cdecl;
   pfnEngSrc_GetPlayerForTrackerID_t = function(trackerID: Integer): Integer; cdecl;
   pfnEngSrc_pfnServerCmdUnreliable_t = function(szCmdString: PAnsiChar): Integer; cdecl;
-  pfnEngSrc_GetMousePos_t = procedure(var ppt: tagPOINT); cdecl;
+  pfnEngSrc_GetMousePos_t = procedure(var ppt: POINT_s); cdecl;
   pfnEngSrc_SetMousePos_t = procedure(x, y: Integer); cdecl;
   pfnEngSrc_SetMouseEnable_t = procedure(fEnable: qboolean); cdecl;
   pfnEngSrc_GetFirstCVarPtr_t = function: PCVar; cdecl;
@@ -5357,7 +5355,7 @@ const
 type
   engine_studio_api_s = record
     // Allocate number*size bytes and zero it
-    Mem_Calloc: function(number: Integer; size: SIZE_T): Pointer; cdecl;
+    Mem_Calloc: function(number: Integer; size: NativeUInt): Pointer; cdecl;
     // Check to see if pointer is in the cache
     Cache_Check: function(const c: cache_user_s): Pointer; cdecl;
     // Load file into cache ( can be swapped out on demand )
@@ -7356,14 +7354,6 @@ type
   floodfill_t = record
     x, y: Smallint;
   end;
-
-  POINT_s = record
-    x, y: Integer;
-  end;
-  POINT = POINT_s;
-
-  TPoint = POINT_s;
-  PPoint = ^POINT_s;
 
   TCoordRect = record
     s0, t0, s1, t1: Single;
