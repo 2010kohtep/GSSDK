@@ -7537,7 +7537,7 @@ type
   dlyline_t = dlyline_s;
 
   TDLYLine = dlyline_s;
-  PDLYLine = dlyline_s;
+  PDLYLine = ^dlyline_s;
   {$IF SizeOf(TDLYLine) <> 60} {$MESSAGE WARN 'Structure size mismatch @ TDLYLine.'} {$DEFINE MSME} {$IFEND}
 
   HPSTR = PAnsiChar;
