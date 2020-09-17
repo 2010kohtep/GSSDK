@@ -24,6 +24,13 @@
 (*    such overridden types in other records can also give an incorrect SizeOf   *)
 (*    value for the record where the type is declared.                           *)
 (*                                                                               *)
+(*  - Never use the $ALIGN compiler directive and its derivatives. The Delphi    *)
+(*    compiler is smart enough to choose the necessary alignment on its own, and *)
+(*    the presence of such a directive will break the SizeOf values for many     *)
+(*    structures (mainly for those with types larger than 4 bytes). Use 'packed' *)
+(*    parameter to set alignment to 1 if you want to turn off alignment for      *)
+(*    certain records (for example - demo_command_t).                            *)
+(*                                                                               *)
 (*  Special tags:                                                                *)
 (*    @xref: Defines the name of the function where you can find out the exact   *)
 (*           size of the type                                                    *)
@@ -41,7 +48,7 @@ unit GoldSrc.SDK;
 interface
 
 const
-  GSSDK_VERSION = 20200901;
+  GSSDK_VERSION = 20200918;
 
 const
   MAX_PATH = 260;
@@ -1399,8 +1406,7 @@ const
 type
   modtype_e =
   (
-    mod_bad = -1,
-    mod_brush,
+    mod_brush = 0,
     mod_sprite,
     mod_alias,
     mod_studio
@@ -4932,7 +4938,7 @@ type
     PM_PlaySound: procedure(channel: Integer; sample: PAnsiChar; volume, attenuation: Single; fFlags, pitch: Integer); cdecl;
     PM_TraceTexture: function(ground: Integer; vstart, vend: PVec): PAnsiChar; cdecl;
     PM_PlaybackEventFull: procedure(flags, clientindex: Integer; eventindex: Word; delay: Single; origin, angles: PVec; fparam1, fparam2: Single; iparam1, iparam2: Integer; bparam1, bparam2: Integer); cdecl;
-    PM_PlayerTraceEx: function(start, &end: PVec; traceFlags: Integer; pfnIgnore: pfnIgnore_t): pmtrace_t; cdecl;
+    PM_PlayerTraceEx: function(start, &end: PVec; traceFlags: Integer; pfnIgnore: pfnIgnore_t): pmtrace_s; cdecl;
     PM_TestPlayerPositionEx: function(pos: PVec; var ptrace: pmtrace_t; pfnIgnore: pfnIgnore_t): Integer; cdecl;
     PM_TraceLineEx: function(start, &end: PVec; flags, usehulll: Integer; pfnIgnore: pfnIgnore_t): pmtrace_s; cdecl;
   end;
@@ -5337,6 +5343,25 @@ type
   TRStudioInterface = r_studio_interface_s;
   PRStudioInterface = ^r_studio_interface_s;
   PPRStudioInterface = ^PRStudioInterface;
+
+  // @xref: R_AddToStudioCache
+  r_studiocache_t = record
+    frame: Single;
+    sequence: Integer;
+    angles: vec3_t;
+    origin: vec3_t;
+    size: vec3_t;
+    controller: array[0..3] of Byte;
+    blending: array[0..1] of Byte;
+    pModel: ^model_t;
+    nStartHull: Integer;
+    nStartPlane: Integer;
+    numhulls: Integer;
+  end;
+
+  TRStudioCache = r_studiocache_t;
+  PRStudioCache = ^r_studiocache_t;
+  {$IF SizeOf(TRStudioCache) <> 68} {$MESSAGE WARN 'Structure size mismatch @ TRStudioCache.'} {$DEFINE MSME} {$IFEND}
 
   alight_s = record
     ambientlight: Integer;	// clip at 128
@@ -6382,6 +6407,74 @@ type
 
   TMStudioMesh = mstudiomesh_t;
   PMStudioMesh = ^mstudiomesh_t;
+
+  // @xref: Mod_LoadStudioModel
+  studiohdr_t = record
+    id: Integer;
+    version: Integer;
+
+    name: array[0..63] of AnsiChar;
+    length: Integer;
+
+    eyeposition: vec3_t; // ideal eye position
+    min: vec3_t; // ideal movement hull size
+    max: vec3_t;
+
+    bbmin: vec3_t; // clipping bounding box
+    bbmax: vec3_t;
+
+    flags: Integer;
+
+    numbones: Integer; // bones
+    boneindex: Integer;
+
+    numbonecontrollers: Integer; // bone controllers
+    bonecontrollerindex: Integer;
+
+    numhitboxes: Integer; // complex bounding boxes
+    hitboxindex: Integer;
+
+    numseq: Integer; // animation sequences
+    seqindex: Integer;
+
+    numseqgroups: Integer; // demand loaded sequences
+    seqgroupindex: Integer;
+
+    numtextures: Integer; // raw textures
+    textureindex: Integer;
+    texturedataindex: Integer;
+
+    numskinref: Integer; // replaceable textures
+    numskinfamilies: Integer;
+    skinindex: Integer;
+
+    numbodyparts: Integer;
+    bodypartindex: Integer;
+
+    numattachments: Integer; // queryable attachable points
+    attachmentindex: Integer;
+
+    soundtable: Integer;
+    soundindex: Integer;
+    soundgroups: Integer;
+    soundgroupindex: Integer;
+
+    numtransitions: Integer; // animation node to animation node transition graph
+    transitionindex: Integer;
+  end;
+
+  TStudioHdr = studiohdr_t;
+  PStudioHdr = ^studiohdr_t;
+  {$IF SizeOf(TStudioHdr) <> 244} {$MESSAGE WARN 'Structure size mismatch @ TStudioHdr.'} {$DEFINE MSME} {$IFEND}
+
+  // skin info
+  mstudiotexture_t = record
+    name: array[0..63] of AnsiChar;
+    flags: Integer;
+    width: Integer;
+    height: Integer;
+    index: Integer;
+  end;
 
   player_model_t = record
     name, modelname: array[0..259] of AnsiChar;
