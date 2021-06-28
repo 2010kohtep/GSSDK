@@ -1,6 +1,6 @@
 # GoldSrc SDK
 
-Relatively full SDK for GoldSource renderer library.
+Relatively full SDK for GoldSource renderer library and Counter-Strike 1.6.
 
 # What is this?
 
