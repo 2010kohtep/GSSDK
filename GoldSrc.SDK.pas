@@ -1,4 +1,4 @@
-(*============ (C) Copyright 2020, Alexander B. All rights reserved. ============*)
+(*============ (C) Copyright 2022, Alexander B. All rights reserved. ============*)
 (*                                                                               *)
 (*  Module:                                                                      *)
 (*    GoldSrc.SDK                                                                *)
@@ -48,7 +48,7 @@ unit GoldSrc.SDK;
 interface
 
 const
-  GSSDK_VERSION = 20200918;
+  GSSDK_VERSION = 20221110;
 
 const
   MAX_PATH = 260;
@@ -1406,7 +1406,8 @@ const
 type
   modtype_e =
   (
-    mod_brush = 0,
+    mod_bad = -1,
+    mod_brush,
     mod_sprite,
     mod_alias,
     mod_studio
@@ -1715,11 +1716,6 @@ const
   MAX_LEVEL_CONNECTIONS = 16; // These are encoded in the lower 16bits of ENTITYTABLE->flags
 
   FRAGMENT_MAX_SIZE = 1400;
-
-  (***************************************************************************************************)
-  (***************************************************************************************************)
-  (***************************************************************************************************)
-  (***************************************************************************************************)
 
 type
   FileHandle_t = Pointer;
@@ -6476,6 +6472,7 @@ type
     index: Integer;
   end;
 
+
   player_model_t = record
     name, modelname: array[0..259] of AnsiChar;
     model: ^model_s;
@@ -7757,6 +7754,7 @@ type
     svc_sendcvarvalue,
     svc_sendcvarvalue2,
     svc_exec,
+    svc_startofusermessages = svc_exec,
     svc_endoflist = 255
   );
   svc_commands_t = svc_commands_e;

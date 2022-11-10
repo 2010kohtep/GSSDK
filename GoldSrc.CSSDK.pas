@@ -8,7 +8,6 @@
 (*                                                                               *)
 (*  Description:                                                                 *)
 (*    Provides relatively full SDK for Counter-Strike 1.6 Mod.                   *)
-(*                                                                               *)
 (*===============================================================================*)
 
 unit GoldSrc.CSSDK;
@@ -22,8 +21,8 @@ uses
 
   GoldSrc.SDK,
 
-  Xander.BaseInterface,
-  Xander.VGUI.SDK;
+  GoldSrc.BaseInterface,
+  GoldSrc.VGUI;
 
 const
   CSSDK_VERSION = 20200831;
